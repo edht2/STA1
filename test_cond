@@ -1,0 +1,7 @@
+counter = 1
+nt = 1
+count_nt = counter + nt
+
+
+if counter < 0 and count_nt >= 0 or counter > 0 and count_nt <= 0: print("NT and counter are positive and negitive")
+else: print("NT and counter are both positive or both negitive")
