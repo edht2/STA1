@@ -34,60 +34,50 @@ class Portfolio:    # portfolio class will caulculate our portfolio, buy and sel
             return share_agg
 
 
-    def weightedAverageCalculator(self):
-        log = []
-        transamount = []
-        for l in range(len(self.shares)): 
-        
-            counter = 0                 
-            nt = 0
-            count_pre_nt = 0
-
-            for j in range(len(self.transactions)):
-                if self.transactions[j][3] == self.shares[l].rname:
-                    nt = self.transactions[j][4]
-
-                    if self.transactions[j][2]   == "buy":  
-                        count_pre_nt = counter
-                        counter += nt
-
-                    elif self.transactions[j][2] == "sell":
-                        count_pre_nt = counter
-                        counter -= nt
-
-                    if count_pre_nt < 0 and counter >= 0 or count_pre_nt > 0 and counter <= 0: 
-                        #print("Toggling between positive and negative or 0")
-                        log = []
-                        transamount = [counter, self.transactions[j][6]]
-
-                    elif count_pre_nt <= 0 and counter < count_pre_nt or count_pre_nt >= 0 and counter > count_pre_nt:
-                        transamount = [self.transactions[j][4], self.transactions[j][6]]
-                        log.append(transamount)
-
-                    print('counter', counter, 'count_pre_nt', count_pre_nt)
-                    print(transamount)
-                    print(log)
-
     def avPriceCalc(self):
         
         for share in self.shares:
             count = 0
             cmlt = 0  # count minus last transaction
-            #print(share.name)
+            trans_log = []
+            trans = []
+            message = ''
             for tr in self.transactions:
-                nt = tr[4]
+                if tr[3] == share.rname:
+                    lt = tr[4]
 
-                if  tr[2] == "buy":  
-                    cmlt = count
-                    count += nt
+                    if  tr[2] == "buy":  
+                        cmlt = count
+                        count += lt
 
-                elif tr[2] == "sell":
-                    cmlt = count
-                    count -= nt
-                print(f"cmlt: {cmlt}, count: {count}, nt: {nt}")
+                    elif tr[2] == "sell":
+                        cmlt = count
+                        count -= lt
+                    if cmlt >= 0 and count > cmlt or cmlt <= 0 and count < cmlt: # if square or net long/short and a purchase/sale is made ...
+                        trans = [tr[4], tr[6]]
+                        trans_log.append(trans)
+                        message = 'net long/short and a purchase/sale has been made. ' + tr[3]
+                    elif cmlt > 0 and count < 0 or cmlt < 0 and count > 0: # if new transaction reverses the long/short position into a short/long position...
+                        trans_log = []
+                        trans = [count, tr[6]]
+                        trans_log.append(trans)
+                        message = 'new transaction reverses the long/short position into a short/long position. ' + tr[3]
+                    elif count == 0: # position is 0
+                        trans_log = []
+                        trans = []
+                        message = 'position is 0' + tr[3]
+                    else: # player is long / short and a sale/purchase has been made not sufficient to reverse the position. Do nothing
+                        message = 'player is long / short and a sale/purchase has been made not sufficient to reverse the position. Do nothing'
+                    print(f"{tr[3]}. Trans_log = {trans_log}\nTrans = {trans}\n")
+                    print(message)
+
+
+                
+
+                
+
     def displayPortfolio(self):
         clear()
-        self.weightedAverageCalculator()
         self.avPriceCalc()
         self.aggregator()
         for i in range(len(self.transactions)):
