@@ -47,10 +47,6 @@ class Portfolio:    # portfolio class will caulculate our portfolio, buy and sel
                 if self.transactions[j][3] == self.shares[l].rname:
                     nt = self.transactions[j][4]
 
-                    transamount = [self.transactions[j][4], self.transactions[j][6]]
-                    log.append(transamount)
-
-                    
                     if self.transactions[j][2]   == "buy":  
                         count_pre_nt = counter
                         counter += nt
@@ -63,12 +59,36 @@ class Portfolio:    # portfolio class will caulculate our portfolio, buy and sel
                         #print("Toggling between positive and negative or 0")
                         log = []
                         transamount = [counter, self.transactions[j][6]]
+
+                    elif count_pre_nt <= 0 and counter < count_pre_nt or count_pre_nt >= 0 and counter > count_pre_nt:
+                        transamount = [self.transactions[j][4], self.transactions[j][6]]
+                        log.append(transamount)
+
+                    print('counter', counter, 'count_pre_nt', count_pre_nt)
                     print(transamount)
                     print(log)
 
+    def avPriceCalc(self):
+        
+        for share in self.shares:
+            count = 0
+            cmlt = 0  # count minus last transaction
+            #print(share.name)
+            for tr in self.transactions:
+                nt = tr[4]
+
+                if  tr[2] == "buy":  
+                    cmlt = count
+                    count += nt
+
+                elif tr[2] == "sell":
+                    cmlt = count
+                    count -= nt
+                print(f"cmlt: {cmlt}, count: {count}, nt: {nt}")
     def displayPortfolio(self):
         clear()
         self.weightedAverageCalculator()
+        self.avPriceCalc()
         self.aggregator()
         for i in range(len(self.transactions)):
             if self.transactions[i][2] ==  "buy": bs = "+"
